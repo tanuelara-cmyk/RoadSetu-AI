@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "users": {
+      "fields": {
+        "uid": { "type": "string", "description": "Unique user identifier" },
+        "name": { "type": "string", "description": "User's full name" },
+        "email": { "type": "string", "description": "User's verified email address" },
+        "role": { "type": "string", "description": "Role: citizen, authority, or contractor" },
+        "createdAt": { "type": "string", "description": "User registration timestamp" },
+        "updatedAt": { "type": "string", "description": "Profile update timestamp" }
+      }
+    },
+    "potholes": {
+      "fields": {
+        "potholeId": { "type": "string", "description": "Permanent civic pothole ID (e.g. PTH-MUM-2026-00142)" },
+        "reportedBy": { "type": "object", "description": "Reporting citizen user information" },
+        "description": { "type": "string", "description": "Citizen description of pothole hazard" },
+        "severity": { "type": "string", "description": "Low, Medium, High, or Critical" },
+        "latitude": { "type": "number", "description": "Original report GPS latitude" },
+        "longitude": { "type": "number", "description": "Original report GPS longitude" },
+        "address": { "type": "string", "description": "Reverse geocoded human-readable street address" },
+        "landmark": { "type": "string", "description": "Nearby landmark or reference point" },
+        "beforeImageUrl": { "type": "string", "description": "Immutable original citizen photo" },
+        "beforeTimestamp": { "type": "string", "description": "Immutable citizen capture timestamp" },
+        "beforeCaptureMetadata": { "type": "object", "description": "Sensor accuracy, aspect ratio, device headers" },
+        "status": { "type": "string", "description": "Reported, Assigned, Repair In Progress, Repair Claimed, Verification In Progress, Verified, Reinspection Required" },
+        "assignedAuthority": { "type": "object", "description": "Government division and supervising engineer" },
+        "assignedContractor": { "type": "object", "description": "Contractor assigned to the repair" },
+        "afterImageUrl": { "type": "string", "description": "Contractor submitted after-repair photo" },
+        "afterTimestamp": { "type": "string", "description": "Contractor repair submission timestamp" },
+        "afterLatitude": { "type": "number", "description": "Contractor repair GPS latitude" },
+        "afterLongitude": { "type": "number", "description": "Contractor repair GPS longitude" },
+        "afterAddress": { "type": "string", "description": "Contractor submission geocoded address" },
+        "afterCaptureMetadata": { "type": "object", "description": "Contractor camera and device telemetry" },
+        "repairDescription": { "type": "string", "description": "Contractor repair work details and methodology" },
+        "materialsUsed": { "type": "string", "description": "Materials and bitumen grade used" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      }
+    },
+    "verification": {
+      "fields": {
+        "verificationId": { "type": "string", "description": "Unique verification audit ID" },
+        "potholeId": { "type": "string", "description": "Associated pothole ID" },
+        "potholeRegionScore": { "type": "number", "description": "Region matching confidence (0-100)" },
+        "gpsScore": { "type": "number", "description": "GPS proximity consistency score (0-100)" },
+        "viewpointScore": { "type": "number", "description": "Camera angle and perspective score (0-100)" },
+        "backgroundMatchScore": { "type": "number", "description": "Background landmarks and structures match (0-100)" },
+        "repairEvidenceScore": { "type": "number", "description": "Surface repair and flushness score (0-100)" },
+        "evidenceQualityScore": { "type": "number", "description": "Lighting, clarity, and resolution quality (0-100)" },
+        "overallVerificationScore": { "type": "number", "description": "Weighted multi-factor verification confidence (0-100)" },
+        "verificationStatus": { "type": "string", "description": "VERIFIED or REINSPECTION REQUIRED" },
+        "explanation": { "type": "string", "description": "Human-readable reasoning for civic transparency" },
+        "createdAt": { "type": "string", "description": "Analysis completion timestamp" }
+      }
+    },
+    "events": {
+      "fields": {
+        "eventId": { "type": "string", "description": "Unique immutable event ID" },
+        "potholeId": { "type": "string", "description": "Associated pothole ID" },
+        "eventType": { "type": "string", "description": "Event classification (e.g. REPORTED, ASSIGNED, REPAIR_CLAIMED, VERIFIED, DISPUTE_RAISED)" },
+        "performedBy": { "type": "object", "description": "User or system agent who performed the action" },
+        "description": { "type": "string", "description": "Detailed explanation of the timeline event" },
+        "timestamp": { "type": "string", "description": "Event timestamp" }
+      }
+    }
+  }
+}
