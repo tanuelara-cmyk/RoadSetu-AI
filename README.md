@@ -9,6 +9,28 @@ RoadSetu AI is an AI-powered civic technology platform that makes pothole report
 The platform connects citizens, authorities, and contractors through a single workflow and uses computer vision, semantic similarity, and geospatial intelligence to verify whether a claimed repair actually belongs to the **same reported pothole**.
 
 ---
+🌐 Live Demo
+RoadSetu AI
+
+Live Prototype:
+
+https://road-setu-ai.vercel.app/
+
+Try the live prototype to explore the complaint tracking and repair-verification workflow.
+
+---
+
+📸 Screenshots
+
+![RoadSetu AI Dashboard] <img width="1917" height="738" alt="Screenshot 2026-09-16 164504" src="https://github.com/user-attachments/assets/a1882be4-3301-4689-8f88-623329398460" />
+
+
+![Complaint Reporting]<img width="1618" height="886" alt="Screenshot 2026-09-16 164526" src="https://github.com/user-attachments/assets/5ed8f2aa-0cca-48ff-9d82-dd849fcf7c12" />
+
+![Track complaint]<img width="1640" height="891" alt="Screenshot 2026-09-16 164542" src="https://github.com/user-attachments/assets/b7c9344c-0ee7-4966-b3cb-2c8e43e139ba" />
+
+
+---
 
 ## 🎯 Problem Statement
 
@@ -117,89 +139,129 @@ Potential Duplicate Reports
 This can help authorities identify repeated complaints about the same road issue.
 
 ---
+## 🔍 Repair Verification
 
-🔍 Repair Verification
+The main innovation of RoadSetu AI is verifying the **same pothole**, not just a repaired-looking road.
 
-The main innovation of RoadSetu AI is verifying the same pothole, not just a repaired-looking road.
+### Example: Suspicious Repair
 
-Example
-BEFORE PHOTO
-📍 Location A
-🕳️ Reported pothole
-        ↓
-CONTRACTOR AFTER PHOTO
-📍 Location B
-🛣️ Repaired road
-        ↓
-GPS / VISUAL / LANDMARK MISMATCH
-        ↓
-⚠️ SUSPICIOUS
+**Before Photo**
 
-If the contractor provides evidence from the original location and the visual context matches:
+📍 Location A  
+🕳️ Reported Pothole
 
-BEFORE PHOTO
-📍 Location A
-🕳️ Reported pothole
-        ↓
-CONTRACTOR AFTER PHOTO
-📍 Location B
-🛣️ Repaired road
-        ↓
-GPS / VISUAL / LANDMARK MISMATCH
-        ↓
-⚠️ SUSPICIOUS
+↓
 
+**Contractor After Photo**
 
- ---
-          
-🛠️ Technology Stack
+📍 Location B  
+🛣️ Repaired Road
 
-Frontend
-React 18
-Tailwind CSS
-Leaflet.js
-Backend
-Node.js
-Express
-REST API
-AI / Computer Vision
-OpenCV
-Keypoint Matching
-SSIM
-Semantic AI
-Embeddings
-Semantic Similarity
-Clustering
-Geospatial Complaint Clustering
-Semantic Complaint Clustering
-GIS
-OpenStreetMap
-Database
-MongoDB
-Hardware
+↓
+
+**GPS / Visual / Landmark Mismatch**
+
+↓
+
+⚠️ **SUSPICIOUS REPAIR**
 
 ---
 
-📊 Expected Impact
-👥 Citizens
-Transparent complaint tracking
-Better visibility of repair progress
-Increased confidence in civic reporting
-🏛️ Authorities
-Centralized complaint management
-Duplicate complaint identification
-Evidence-based repair monitoring
-Identification of suspicious repair claims
-👷 Contractors
-Clear repair evidence requirements
-Transparent verification process
-Traceable repair submissions
-🏙️ Smart Cities
-Data-driven road maintenance
-Better civic accountability
-Scalable digital infrastructure monitoring
+### Example: Verified Repair
+
+**Before Photo**
+
+📍 Location A  
+🕳️ Reported Pothole
+
+↓
+
+**Contractor After Photo**
+
+📍 Location A  
+🛣️ Repaired Road
+
+↓
+
+**GPS + Visual Context Match**
+
+↓
+
+✅ **REPAIR VERIFIED**
 
 ---
+## 🛠️ Technology Stack
+
+### 🎨 Frontend
+
+- React 18
+- Tailwind CSS
+- Leaflet.js
+
+### ⚙️ Backend
+
+- Node.js
+- Express
+- REST API
+
+### 🤖 AI / Computer Vision
+
+- OpenCV
+- Keypoint Matching
+- SSIM (Structural Similarity Index)
+
+### 🧠 Semantic AI
+
+- Embeddings
+- Semantic Similarity
+
+### 📍 Clustering
+
+- Geospatial Complaint Clustering
+- Semantic Complaint Clustering
+
+### 🗺️ GIS
+
+- OpenStreetMap
+
+### 🗄️ Database
+
+- MongoDB
+
+### 💻 Hardware
+
+- Zero Proprietary Hardware
+
+---
+## 📊 Expected Impact
+
+### 👥 Citizens
+
+- Transparent complaint tracking
+- Better visibility of repair progress
+- Increased confidence in civic reporting
+
+### 🏛️ Municipal Authorities
+
+- Centralized complaint management
+- Duplicate complaint identification
+- Evidence-based repair monitoring
+- Identification of suspicious repair claims
+
+### 👷 Contractors
+
+- Clear repair evidence requirements
+- Transparent verification process
+- Traceable repair submissions
+
+### 🏙️ Smart Cities
+
+- Data-driven road maintenance
+- Better civic accountability
+- Scalable digital infrastructure monitoring
+
+---
+
 
 🔮 Future Scope
 
@@ -224,30 +286,6 @@ REPAIR
 VERIFY
    ↓
 ACCOUNTABILITY
-
----
-
-🌐 Live Demo
-RoadSetu AI
-
-Live Prototype:
-
-https://road-setu-ai.vercel.app/
-
-Try the live prototype to explore the complaint tracking and repair-verification workflow.
-
----
-
-📸 Screenshots
-
-![RoadSetu AI Dashboard](<img width="1917" height="738" alt="Screenshot 2026-09-16 164504" src="https://github.com/user-attachments/assets/a1882be4-3301-4689-8f88-623329398460" />
-)
-
-![Complaint Reporting](<img width="1618" height="886" alt="Screenshot 2026-09-16 164526" src="https://github.com/user-attachments/assets/5ed8f2aa-0cca-48ff-9d82-dd849fcf7c12" />
-)
-
-![Track complaint](<img width="1640" height="891" alt="Screenshot 2026-09-16 164542" src="https://github.com/user-attachments/assets/b7c9344c-0ee7-4966-b3cb-2c8e43e139ba" />
-)
 
 ---
 
