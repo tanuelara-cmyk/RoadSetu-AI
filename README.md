@@ -87,7 +87,7 @@ Public Accountability
 ```
 ---
 
-##👤 Citizen Reporting
+## 👤 Citizen Reporting
 
 Citizens can:
 
