@@ -87,7 +87,7 @@ Public Accountability
 ```
 ---
 
-👤 Citizen Reporting
+##👤 Citizen Reporting
 
 Citizens can:
 
@@ -108,7 +108,6 @@ Visual similarity analysis
 
 These signals help determine whether the before and after images represent the same physical location.
 
----
 
 🧠 Semantic AI
 
@@ -120,7 +119,6 @@ Semantic Similarity
 
 This helps identify complaints that describe similar problems even when citizens use different words.
 
----
 
 🗺️ Geospatial Complaint Clustering
 
@@ -163,8 +161,6 @@ The main innovation of RoadSetu AI is verifying the **same pothole**, not just a
 ↓
 
 ⚠️ **SUSPICIOUS REPAIR**
-
----
 
 ### Example: Verified Repair
 
