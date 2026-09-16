@@ -139,61 +139,21 @@ If the contractor provides evidence from the original location and the visual co
 
 BEFORE PHOTO
 📍 Location A
-        +
-AFTER PHOTO
-📍 Location A
+🕳️ Reported pothole
         ↓
-Visual + Geospatial Match
+CONTRACTOR AFTER PHOTO
+📍 Location B
+🛣️ Repaired road
         ↓
-✅ Verifed
+GPS / VISUAL / LANDMARK MISMATCH
+        ↓
+⚠️ SUSPICIOUS
 
----
-
-🏗️ System Architecture
-
-┌─────────────────────┐
-│      CITIZENS       │
-│  Report Potholes    │
-└──────────┬──────────┘
-           ↓
-┌─────────────────────┐
-│    React Frontend   │
-│  Tailwind + Leaflet │
-└──────────┬──────────┘
-           ↓
-┌─────────────────────┐
-│   Node.js + Express │
-│      REST API       │
-└──────────┬──────────┘
-           ↓
-    ┌──────┴───────┐
-    ↓              ↓
-┌─────────┐   ┌─────────────┐
-│ MongoDB │   │ AI / Vision │
-└─────────┘   └──────┬──────┘
-                     ↓
-             ┌───────────────┐
-             │ OpenCV        │
-             │ Keypoints     │
-             │ SSIM          │
-             │ Embeddings    │
-             └───────┬───────┘
-                     ↓
-            ┌──────────────────┐
-            │ Repair Verification│
-            └────────┬─────────┘
-                     ↓
-          ┌──────────┼──────────┐
-          ↓          ↓          ↓
-      VERIFIED   SUSPICIOUS   FAILED
-          ↓          ↓          ↓
-          └──────────┼──────────┘
-                     ↓
-          Accountability Dashboard
 
  ---
           
 🛠️ Technology Stack
+
 Frontend
 React 18
 Tailwind CSS
