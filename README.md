@@ -63,6 +63,7 @@ VERIFIED  SUSPICIOUS FAILED
 Public Accountability
 
 ```
+---
 
 👤 Citizen Reporting
 
@@ -85,6 +86,8 @@ Visual similarity analysis
 
 These signals help determine whether the before and after images represent the same physical location.
 
+---
+
 🧠 Semantic AI
 
 RoadSetu AI also uses semantic information to understand complaints.
@@ -94,6 +97,8 @@ Embeddings
 Semantic Similarity
 
 This helps identify complaints that describe similar problems even when citizens use different words.
+
+---
 
 🗺️ Geospatial Complaint Clustering
 
@@ -110,6 +115,9 @@ Complaint Clustering
 Potential Duplicate Reports
 
 This can help authorities identify repeated complaints about the same road issue.
+
+---
+
 🔍 Repair Verification
 
 The main innovation of RoadSetu AI is verifying the same pothole, not just a repaired-looking road.
@@ -137,8 +145,12 @@ AFTER PHOTO
         ↓
 Visual + Geospatial Match
         ↓
-✅ VERIFIED
+✅ Verifed
+
+---
+
 🏗️ System Architecture
+
 ┌─────────────────────┐
 │      CITIZENS       │
 │  Report Potholes    │
@@ -178,6 +190,9 @@ Visual + Geospatial Match
           └──────────┼──────────┘
                      ↓
           Accountability Dashboard
+
+ ---
+          
 🛠️ Technology Stack
 Frontend
 React 18
@@ -203,12 +218,8 @@ Database
 MongoDB
 Hardware
 
-The system produces:
+---
 
-Status	Meaning
-✅ VERIFIED	Evidence sufficiently matches the reported pothole
-⚠️ SUSPICIOUS	Evidence contains a possible location/visual mismatch
-❌ FAILED	Verification requirements are not satisfied
 📊 Expected Impact
 👥 Citizens
 Transparent complaint tracking
@@ -227,6 +238,9 @@ Traceable repair submissions
 Data-driven road maintenance
 Better civic accountability
 Scalable digital infrastructure monitoring
+
+---
+
 🔮 Future Scope
 
 The RoadSetu AI verification framework can be extended beyond potholes.
@@ -240,7 +254,7 @@ Possible applications include:
 🗑️ Garbage hotspots
 🛣️ Damaged roads
 🏗️ Damaged public infrastructure
-Future Vision
+
 REPORT
    ↓
 TRACK
@@ -250,6 +264,9 @@ REPAIR
 VERIFY
    ↓
 ACCOUNTABILITY
+
+---
+
 🌐 Live Demo
 RoadSetu AI
 
@@ -259,7 +276,6 @@ https://road-setu-ai.vercel.app/
 
 Try the live prototype to explore the complaint tracking and repair-verification workflow.
 
----
 ---
 
 📸 Screenshots
@@ -276,9 +292,11 @@ Try the live prototype to explore the complaint tracking and repair-verification
 ---
 
 👥 Team Synora
-Yashaswi Singh	Team Lead
-Tanu Yadav	Team Member
-Swarangi Vishwasrao	Team Member
+| Member                  | Role        |
+| ----------------------- | ----------- |
+| **Yashaswi Singh**      | Team Lead   |
+| **Tanu Yadav**          | Team Member |
+| **Swarangi Vishwasrao** | Team Member |
 
 ---
 
