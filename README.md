@@ -138,7 +138,6 @@ Potential Duplicate Reports
 
 This can help authorities identify repeated complaints about the same road issue.
 
----
 ## 🔍 Repair Verification
 
 The main innovation of RoadSetu AI is verifying the **same pothole**, not just a repaired-looking road.
@@ -189,7 +188,6 @@ The main innovation of RoadSetu AI is verifying the **same pothole**, not just a
 
 ✅ **REPAIR VERIFIED**
 
----
 ## 🛠️ Technology Stack
 
 ### 🎨 Frontend
@@ -232,7 +230,6 @@ The main innovation of RoadSetu AI is verifying the **same pothole**, not just a
 
 - Zero Proprietary Hardware
 
----
 ## 📊 Expected Impact
 
 ### 👥 Citizens
