@@ -62,7 +62,8 @@ VERIFIED  SUSPICIOUS FAILED
           ↓
 Public Accountability
 
----
+```
+
 👤 Citizen Reporting
 
 Citizens can:
