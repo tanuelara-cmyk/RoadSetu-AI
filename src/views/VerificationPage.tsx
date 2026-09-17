@@ -3,8 +3,7 @@ import { PotholeRecord, VerificationResult } from '../types';
 import { VerificationScorecard } from '../components/VerificationScorecard';
 import { EvidenceMap } from '../components/EvidenceMap';
 import { WorkflowVisualizer } from '../components/WorkflowVisualizer';
-import { SampleVerificationFlow } from '../components/SampleVerificationFlow';
-import { formatCoordinates, formatDistance, calculateDistanceMeters } from '../utils/geo';
+import { formatDistance, calculateDistanceMeters } from '../utils/geo';
 import {
   Sparkles,
   ShieldCheck,
@@ -17,14 +16,12 @@ import {
   XCircle,
   HardHat,
   UserCheck,
-  PlayCircle,
 } from 'lucide-react';
 
 interface VerificationPageProps {
   pothole: PotholeRecord;
   onBack: () => void;
   onRunVerification: (potholeId: string) => Promise<VerificationResult>;
-  onSelectScenario: (scenarioId: string) => void;
   onResolveComplaint?: (potholeId: string) => Promise<void> | void;
 }
 
@@ -32,13 +29,11 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
   pothole,
   onBack,
   onRunVerification,
-  onSelectScenario,
   onResolveComplaint,
 }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isResolved, setIsResolved] = useState(pothole.status === 'Resolved');
-  const [showStepByStepWalkthrough, setShowStepByStepWalkthrough] = useState(false);
   const [verification, setVerification] = useState<VerificationResult | null>(
     pothole.verification || null
   );
@@ -90,64 +85,16 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
           <span>Back to Complaint Details</span>
         </button>
 
-        {/* Quick Scenario Switcher */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Sample Scenarios:
-          </span>
-          <button
-            onClick={() => {
-              setShowStepByStepWalkthrough(true);
-              onSelectScenario('demo-genuine');
-            }}
-            className={`text-xs px-2.5 py-1 rounded-md font-bold transition-all ${
-              pothole.potholeId === 'PTH-MUM-2026-00142' && showStepByStepWalkthrough
-                ? 'bg-emerald-700 text-white shadow-xs'
-                : 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
-            }`}
-          >
-            1. Genuine Repair
-          </button>
-          <button
-            onClick={() => {
-              setShowStepByStepWalkthrough(true);
-              onSelectScenario('demo-gaming');
-            }}
-            className={`text-xs px-2.5 py-1 rounded-md font-bold transition-all ${
-              pothole.potholeId === 'PTH-BLR-2026-00088' && showStepByStepWalkthrough
-                ? 'bg-rose-700 text-white shadow-xs'
-                : 'bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100'
-            }`}
-          >
-            2. Gaming Attempt
-          </button>
-
-          <button
-            onClick={() => setShowStepByStepWalkthrough(!showStepByStepWalkthrough)}
-            className={`text-xs px-3 py-1 rounded-md font-bold border transition-all flex items-center gap-1.5 ${
-              showStepByStepWalkthrough
-                ? 'bg-sky-700 text-white border-sky-700'
-                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
-            }`}
-          >
-            <PlayCircle className="w-3.5 h-3.5" />
-            <span>{showStepByStepWalkthrough ? 'Hide 4-Step Walkthrough' : 'Show 4-Step Walkthrough'}</span>
-          </button>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
+          <ShieldCheck className="w-3.5 h-3.5 text-sky-700" />
+          <span>Complaint: {pothole.complaintId || pothole.potholeId}</span>
         </div>
       </div>
 
-      {/* 1. VISUAL WORKFLOW PIPELINE */}
+      {/* 1. VISUAL WORKFLOW PIPELINE (4-Step Walkthrough) */}
       <WorkflowVisualizer currentStatus={pothole.status} />
 
-      {/* 2. INTERACTIVE SAMPLE VERIFICATION WALKTHROUGH (Assign Contractor -> Contractor Upload -> AI Verification -> Result) */}
-      {showStepByStepWalkthrough && (
-        <SampleVerificationFlow
-          onResolveComplaint={onResolveComplaint}
-          onViewDetails={onBack}
-        />
-      )}
-
-      {/* 3. CASE AUDIT HEADER */}
+      {/* 2. CASE AUDIT HEADER */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -159,7 +106,7 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
               Audit Comparison &amp; Fraud Detection
             </h1>
             <p className="text-xs text-slate-600 mt-1">
-              Case <span className="font-mono font-bold text-slate-900">{pothole.potholeId}</span>:
+              Case <span className="font-mono font-bold text-slate-900">{pothole.complaintId || pothole.potholeId}</span>:
               Evaluating whether the submitted after-repair photo represents the exact same pothole and location reported by the citizen.
             </p>
           </div>
@@ -195,7 +142,7 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
         )}
       </div>
 
-      {/* 4. VERIFICATION RESULT BANNER (EXACT THREE OUTCOMES) */}
+      {/* 3. VERIFICATION RESULT BANNER (EXACT THREE OUTCOMES) */}
       {verification && (
         <div className="space-y-4">
           {verification.verificationStatus === 'VERIFIED' ? (
@@ -220,32 +167,31 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
                     {verification.explanation}
                   </p>
                   <p className="text-xs font-extrabold text-emerald-950 mt-1.5">
-                    → Complaint can then become RESOLVED.
+                    → Complaint can now become RESOLVED.
                   </p>
                 </div>
               </div>
 
-              {/* Action to officially mark as RESOLVED */}
-              <div className="shrink-0 sm:text-right">
+              <div className="shrink-0 flex sm:flex-col items-center sm:items-end gap-2">
                 {isResolved || pothole.status === 'Resolved' ? (
-                  <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold shadow-xs">
+                  <span className="px-4 py-2 rounded-xl bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Status: RESOLVED</span>
-                  </div>
+                    <span>Complaint Resolved</span>
+                  </span>
                 ) : (
                   <button
                     onClick={handleResolve}
-                    className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+                    className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Mark Complaint as RESOLVED</span>
+                    <span>Approve &amp; Mark Resolved</span>
                   </button>
                 )}
               </div>
             </div>
           ) : verification.verificationStatus === 'SUSPICIOUS' ? (
             <div className="p-5 rounded-2xl bg-amber-50 border-2 border-amber-500 shadow-xs flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
@@ -254,17 +200,17 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
                     🟡 SUSPICIOUS REPAIR
                   </span>
                   <span className="text-xs font-bold text-amber-900 bg-amber-200 px-2.5 py-0.5 rounded-full">
-                    Low / Borderline Match
+                    Discrepancy Detected
                   </span>
                 </div>
                 <p className="text-xs font-bold text-amber-950 mt-1">
-                  → Evidence does not sufficiently match.
+                  → Discrepancy detected: Background mismatch / wrong camera viewpoint / spatial distance tolerance breach.
                 </p>
                 <p className="text-xs text-amber-900 mt-0.5">
                   {verification.explanation}
                 </p>
                 <p className="text-xs font-extrabold text-amber-950 mt-1.5">
-                  → Keep complaint open for authority review.
+                  → Sent to Municipal Authority for manual review. Do NOT mark as resolved automatically.
                 </p>
               </div>
             </div>
@@ -283,13 +229,13 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
                   </span>
                 </div>
                 <p className="text-xs font-bold text-rose-950 mt-1">
-                  → Invalid / unrelated evidence detected.
+                  → Pothole still open, fake image, or gaming attempt detected.
                 </p>
                 <p className="text-xs text-rose-900 mt-0.5">
                   {verification.explanation}
                 </p>
                 <p className="text-xs font-extrabold text-rose-950 mt-1.5">
-                  → Do NOT mark as resolved. Payout blocked.
+                  → Contractor must redo repair. Payout blocked.
                 </p>
               </div>
             </div>
@@ -297,7 +243,7 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
         </div>
       )}
 
-      {/* 5. SIDE-BY-SIDE PHOTOGRAPHIC COMPARISON */}
+      {/* 4. SIDE-BY-SIDE PHOTOGRAPHIC COMPARISON */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
@@ -325,8 +271,8 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
                 alt="Before evidence"
                 className="w-full h-full object-contain"
               />
-              <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900/80 rounded text-[10px] text-white font-mono backdrop-blur-xs">
-                {formatCoordinates(pothole.latitude, pothole.longitude)}
+              <div className="absolute top-2 left-2 px-2.5 py-1 bg-slate-900/80 rounded text-[10px] text-emerald-400 font-semibold backdrop-blur-xs">
+                ✓ Verified Location Geotag
               </div>
             </div>
 
@@ -362,8 +308,8 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
                     alt="After repair evidence"
                     className="w-full h-full object-contain"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900/80 rounded text-[10px] text-white font-mono backdrop-blur-xs">
-                    {formatCoordinates(pothole.afterLatitude!, pothole.afterLongitude!)}
+                  <div className="absolute top-2 left-2 px-2.5 py-1 bg-slate-900/80 rounded text-[10px] text-emerald-400 font-semibold backdrop-blur-xs">
+                    ✓ Contractor On-Site Geotag
                   </div>
                 </>
               ) : (
@@ -396,12 +342,12 @@ export const VerificationPage: React.FC<VerificationPageProps> = ({
         </div>
       </div>
 
-      {/* 6. VERIFICATION SCORECARD */}
+      {/* 5. VERIFICATION SCORECARD */}
       {verification && (
         <VerificationScorecard result={verification} />
       )}
 
-      {/* 7. GEOSPATIAL PROXIMITY AUDIT */}
+      {/* 6. GEOSPATIAL PROXIMITY AUDIT */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 mb-4 flex items-center gap-2">
           <MapPin className="w-4 h-4 text-sky-700" />

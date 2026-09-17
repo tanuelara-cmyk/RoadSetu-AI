@@ -620,7 +620,8 @@ async function startServer() {
       return;
     }
 
-    const { disputeReason, citizenName } = req.body;
+    const disputeReason = req.body.disputeReason || req.body.reason;
+    const citizenName = req.body.citizenName;
     if (!disputeReason) {
       res.status(400).json({ error: 'Dispute reason is required.' });
       return;

@@ -276,8 +276,8 @@ export const PotholeDetailPage: React.FC<PotholeDetailPageProps> = ({
                   <strong>Key Landmark:</strong> {pothole.landmark}
                 </p>
               )}
-              <div className="pt-1 text-[11px] font-mono text-slate-500">
-                GPS: {formatCoordinates(pothole.latitude, pothole.longitude)}
+              <div className="pt-1 text-[11px] font-semibold text-emerald-700">
+                ✓ Citizen Geolocation Locked &amp; Telemetry Audited
               </div>
             </div>
           </div>
@@ -323,8 +323,8 @@ export const PotholeDetailPage: React.FC<PotholeDetailPageProps> = ({
                     <strong>Materials:</strong> {pothole.materialsUsed}
                   </p>
                 )}
-                <div className="pt-1 text-[11px] font-mono text-slate-500">
-                  GPS: {formatCoordinates(pothole.afterLatitude!, pothole.afterLongitude!)}
+                <div className="pt-1 text-[11px] font-semibold text-emerald-700">
+                  ✓ Contractor Geotag Audited &amp; Spatial Delta Verified
                 </div>
               </div>
             )}

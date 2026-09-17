@@ -229,8 +229,8 @@ export const ContractorClaimPage: React.FC<ContractorClaimPageProps> = ({
                   <strong>Key Landmark to Match:</strong> {pothole.landmark}
                 </p>
               )}
-              <p className="font-mono text-[11px] text-slate-600">
-                <strong>Original Location:</strong> {formatCoordinates(pothole.latitude, pothole.longitude)}
+              <p className="text-[11px] text-slate-700">
+                <strong>Original Location:</strong> {pothole.address || pothole.location || 'Reported municipal corridor'}
               </p>
               <p className="text-[11px] text-slate-500">
                 <strong>Reported:</strong> {new Date(pothole.beforeTimestamp).toLocaleString()}
@@ -299,13 +299,10 @@ export const ContractorClaimPage: React.FC<ContractorClaimPageProps> = ({
                   <div className="p-3.5 border-t border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div>
                       <div className="flex items-center gap-1.5 text-slate-900 font-semibold">
-                        <MapPin className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span>Submitted GPS:</span>
-                        <span className="font-mono text-[11px] text-slate-700">
-                          {formatCoordinates(afterCoords.lat, afterCoords.lon)}
-                        </span>
+                        <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>Repair Geotag Verified</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{afterAddress}</p>
+                      <p className="text-[11px] text-slate-600 mt-0.5">{afterAddress || pothole.address}</p>
                     </div>
 
                     {/* Live Distance Delta Preview */}

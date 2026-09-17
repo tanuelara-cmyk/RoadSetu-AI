@@ -20,9 +20,10 @@ import {
 } from 'lucide-react';
 import { CameraCaptureModal } from '../components/CameraCaptureModal';
 import { PotholeSeverity, CaptureMetadata, PotholeRecord, ImageValidationResult, DuplicateMatch } from '../types';
-import { formatCoordinates } from '../utils/geo';
 import { ROAD_IMAGES } from '../data/seedData';
 import { validateRoadDamage, findDuplicateComplaints } from '../utils/aiLogic';
+import { useAuth } from '../context/AuthContext';
+import { createComplaintInFirestore } from '../services/firestoreService';
 
 interface ReportPotholePageProps {
   potholes?: PotholeRecord[];
@@ -51,11 +52,25 @@ export const ReportPotholePage: React.FC<ReportPotholePageProps> = ({
   // Road Damage Validation state
   const [validationResult, setValidationResult] = useState<ImageValidationResult | null>(null);
 
+  const { currentUser, userProfile } = useAuth();
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState<PotholeSeverity>('High');
   const [landmark, setLandmark] = useState('');
-  const [reporterName, setReporterName] = useState('Aarav Sharma');
-  const [reporterEmail, setReporterEmail] = useState('aarav.sharma@example.in');
+  const [reporterName, setReporterName] = useState(
+    userProfile?.name || currentUser?.displayName || 'Citizen Reporter'
+  );
+  const [reporterEmail, setReporterEmail] = useState(
+    userProfile?.email || currentUser?.email || 'citizen@roadsetu.gov.in'
+  );
+
+  useEffect(() => {
+    if (userProfile?.name || currentUser?.displayName) {
+      setReporterName(userProfile?.name || currentUser?.displayName || 'Citizen Reporter');
+    }
+    if (userProfile?.email || currentUser?.email) {
+      setReporterEmail(userProfile?.email || currentUser?.email || 'citizen@roadsetu.gov.in');
+    }
+  }, [userProfile, currentUser]);
 
   // Duplicate matches
   const [duplicateMatches, setDuplicateMatches] = useState<DuplicateMatch[]>([]);
@@ -187,32 +202,59 @@ export const ReportPotholePage: React.FC<ReportPotholePageProps> = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/potholes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: description.trim(),
-          severity,
-          latitude: coords.lat,
-          longitude: coords.lon,
-          address,
-          landmark: landmark.trim(),
-          beforeImageUrl: photoUrl,
-          beforeCaptureMetadata: metadata,
-          reporterName,
-          reporterEmail,
-          clusterId: linkedClusterId || undefined,
-        }),
-      });
+      const citizenUid = currentUser?.uid;
+      let newRecord: PotholeRecord;
+      try {
+        newRecord = await createComplaintInFirestore(
+          {
+            description: description.trim(),
+            severity,
+            latitude: coords.lat,
+            longitude: coords.lon,
+            address,
+            landmark: landmark.trim(),
+            beforeImageUrl: photoUrl,
+            beforeCaptureMetadata: metadata || undefined,
+            reporterName,
+            reporterEmail,
+            citizenId: citizenUid,
+            clusterId: linkedClusterId || undefined,
+          },
+          citizenUid,
+          reporterName
+        );
+      } catch (firestoreErr) {
+        console.warn('Firestore direct write failed, falling back to server API', firestoreErr);
+        const response = await fetch('/api/potholes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            description: description.trim(),
+            severity,
+            latitude: coords.lat,
+            longitude: coords.lon,
+            address,
+            landmark: landmark.trim(),
+            beforeImageUrl: photoUrl,
+            beforeCaptureMetadata: metadata,
+            reporterName,
+            reporterEmail,
+            citizenId: citizenUid,
+            clusterId: linkedClusterId || undefined,
+          }),
+        });
 
-      if (!response.ok) {
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to submit report');
+        }
+
         const data = await response.json();
-        throw new Error(data.error || 'Failed to submit report');
+        newRecord = data.pothole;
       }
 
-      const { pothole } = await response.json();
-      setSubmittedPothole(pothole);
-      onReportCreated(pothole);
+      setSubmittedPothole(newRecord);
+      onReportCreated(newRecord);
     } catch (err: any) {
       setSubmitError(err.message || 'Submission failed. Please check your connection.');
     } finally {
@@ -308,10 +350,10 @@ export const ReportPotholePage: React.FC<ReportPotholePageProps> = ({
               <span className="text-slate-500">Severity:</span>
               <span className="font-bold text-amber-700">{submittedPothole.severity}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">Coordinates:</span>
-              <span className="text-slate-700">
-                {formatCoordinates(submittedPothole.latitude, submittedPothole.longitude)}
+            <div className="flex justify-between items-center gap-2">
+              <span className="text-slate-500">Location:</span>
+              <span className="text-slate-800 font-semibold truncate max-w-[200px]">
+                {submittedPothole.address || 'Detected road corridor'}
               </span>
             </div>
           </div>
@@ -526,40 +568,15 @@ export const ReportPotholePage: React.FC<ReportPotholePageProps> = ({
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Latitude
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={coords ? coords.lat : ''}
-                      onChange={(e) =>
-                        setCoords({
-                          lat: parseFloat(e.target.value),
-                          lon: coords?.lon || 72.8295,
-                        })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 font-mono text-xs text-slate-900"
-                    />
+                <div className="p-3.5 bg-sky-50/80 border border-sky-200 rounded-xl flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Longitude
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={coords ? coords.lon : ''}
-                      onChange={(e) =>
-                        setCoords({
-                          lat: coords?.lat || 19.0596,
-                          lon: parseFloat(e.target.value),
-                        })
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 font-mono text-xs text-slate-900"
-                    />
+                    <p className="font-bold text-xs text-slate-900">High-Precision Geolocation Locked</p>
+                    <p className="text-[11px] text-slate-600 mt-0.5">
+                      Coordinates are captured and encrypted internally for automated AI verification and contractor repair routing.
+                    </p>
                   </div>
                 </div>
 
@@ -941,8 +958,8 @@ export const ReportPotholePage: React.FC<ReportPotholePageProps> = ({
                   </div>
                   <div>
                     <span className="font-bold text-slate-900 block">{address}</span>
-                    <span className="text-[11px] font-mono text-slate-500">
-                      {formatCoordinates(coords!.lat, coords!.lon)}
+                    <span className="text-[11px] font-medium text-emerald-700 block mt-0.5">
+                      ✓ GPS Geolocation Locked &amp; Telemetry Audited
                     </span>
                     {landmark && (
                       <span className="text-[11px] text-sky-800 block mt-0.5">

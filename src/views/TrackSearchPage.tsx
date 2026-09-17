@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Search, MapPin, Calendar, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 import { PotholeRecord } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
-import { formatCoordinates } from '../utils/geo';
 
 interface TrackSearchPageProps {
   potholes?: PotholeRecord[];

@@ -17,6 +17,7 @@ export type PotholeStatus =
   | 'Assigned'
   | 'Repair In Progress'
   | 'Repair Claimed'
+  | 'AI Verification'
   | 'Verification In Progress'
   | 'Verified'
   | 'Resolved'
@@ -120,8 +121,11 @@ export interface ActivityEvent {
     | 'ASSIGNED'
     | 'REPAIR_STARTED'
     | 'REPAIR_CLAIMED'
+    | 'AI_VERIFICATION'
     | 'VERIFICATION_STARTED'
     | 'VERIFIED'
+    | 'SUSPICIOUS'
+    | 'FAILED'
     | 'REINSPECTION_REQUESTED'
     | 'DISPUTE_RAISED'
     | 'RESOLVED';
@@ -137,6 +141,9 @@ export interface ActivityEvent {
 
 export interface PotholeRecord {
   potholeId: string; // e.g. PTH-MUM-2026-00142
+  complaintId?: string; // requested alias for potholeId
+  citizenId?: string; // requested citizenId
+  citizenName?: string; // requested citizenName
   reportedBy: {
     uid: string;
     name: string;
@@ -147,10 +154,12 @@ export interface PotholeRecord {
   latitude: number;
   longitude: number;
   address: string;
+  location?: string; // requested location/address alias
   landmark?: string;
   
   // Original immutable evidence
   beforeImageUrl: string;
+  originalImage?: string; // requested alias for beforeImageUrl
   beforeTimestamp: string;
   beforeCaptureMetadata: CaptureMetadata;
 
@@ -166,9 +175,12 @@ export interface PotholeRecord {
     name: string;
     company: string;
   };
+  contractorId?: string; // requested contractorId
+  contractorName?: string; // requested contractorName
 
   // Contractor submitted repair evidence
   afterImageUrl?: string;
+  repairImage?: string; // requested alias for afterImageUrl
   afterTimestamp?: string;
   afterLatitude?: number;
   afterLongitude?: number;
@@ -179,6 +191,7 @@ export interface PotholeRecord {
 
   // Verification
   verification?: VerificationResult;
+  verificationResult?: VerificationResult; // requested alias for verification
 
   // Road Damage Validation
   beforeValidation?: ImageValidationResult;

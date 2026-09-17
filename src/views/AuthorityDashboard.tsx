@@ -58,8 +58,27 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
       p.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === 'all' || p.status.toLowerCase() === statusFilter.toLowerCase();
+    let matchesStatus = true;
+    if (statusFilter === 'pending') {
+      matchesStatus = p.status === 'Reported';
+    } else if (statusFilter === 'inprogress') {
+      matchesStatus = p.status === 'Assigned' || p.status === 'Repair In Progress';
+    } else if (statusFilter === 'repairclaimed') {
+      matchesStatus = p.status === 'Repair Claimed';
+    } else if (statusFilter === 'ai_verification') {
+      matchesStatus = p.status === 'AI Verification' || p.status === 'Verification In Progress';
+    } else if (statusFilter === 'resolved') {
+      matchesStatus = p.status === 'Resolved';
+    } else if (statusFilter === 'suspicious') {
+      matchesStatus =
+        p.status === 'Suspicious' ||
+        p.status === 'Reinspection Required' ||
+        p.status === 'Failed' ||
+        p.verification?.verificationStatus === 'SUSPICIOUS' ||
+        p.verification?.verificationStatus === 'FAILED';
+    } else if (statusFilter !== 'all') {
+      matchesStatus = p.status.toLowerCase() === statusFilter.toLowerCase();
+    }
 
     const matchesSeverity =
       severityFilter === 'all' || p.severity.toLowerCase() === severityFilter.toLowerCase();
@@ -74,15 +93,33 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
     return matchesSearch && matchesStatus && matchesSeverity && matchesCity;
   });
 
-  // Stats Counters
-  const countReported = safePotholes.filter((p) => p.status === 'Reported').length;
-  const countAssigned = safePotholes.filter((p) => p.status === 'Assigned' || p.status === 'Repair In Progress').length;
-  const countInVerification = safePotholes.filter((p) => p.status === 'Repair Claimed').length;
-  const countVerified = safePotholes.filter((p) => p.status === 'Verified').length;
+  // 7 Explicit Stats Counters per User Requirement
+  const countTotal = safePotholes.length;
+  const countPending = safePotholes.filter((p) => p.status === 'Reported').length;
+  const countInProgress = safePotholes.filter(
+    (p) => p.status === 'Assigned' || p.status === 'Repair In Progress'
+  ).length;
+  const countRepairClaimed = safePotholes.filter((p) => p.status === 'Repair Claimed').length;
+  const countAiVerification = safePotholes.filter(
+    (p) => p.status === 'AI Verification' || p.status === 'Verification In Progress'
+  ).length;
+  const countResolved = safePotholes.filter((p) => p.status === 'Resolved').length;
+  const countSuspicious = safePotholes.filter(
+    (p) =>
+      p.status === 'Suspicious' ||
+      p.status === 'Reinspection Required' ||
+      p.status === 'Failed' ||
+      (p.verification && p.verification.verificationStatus === 'SUSPICIOUS') ||
+      (p.verification && p.verification.verificationStatus === 'FAILED')
+  ).length;
+
   const reinspectionCases = safePotholes.filter(
     (p) =>
       p.status === 'Reinspection Required' ||
-      (p.verification && p.verification.verificationStatus === 'REINSPECTION REQUIRED') ||
+      p.status === 'Suspicious' ||
+      p.status === 'Failed' ||
+      (p.verification && p.verification.verificationStatus === 'SUSPICIOUS') ||
+      (p.verification && p.verification.verificationStatus === 'FAILED') ||
       !!p.disputeReason
   );
 
@@ -122,46 +159,62 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
         </div>
       </div>
 
-      {/* 5 Stats Overview Counters */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <span className="text-slate-500 block text-[10px] uppercase font-bold">Total Reported</span>
+      {/* 7 Stats Overview Counters per User Specification */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
+        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-slate-500 block text-[10px] uppercase font-bold">Total</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl font-extrabold text-slate-900">{countReported}</span>
-            <span className="text-[10px] text-slate-400 font-semibold">Awaiting Action</span>
+            <span className="text-2xl font-extrabold text-slate-900">{countTotal}</span>
           </div>
+          <span className="text-[10px] text-slate-400 font-medium">All Reports</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <span className="text-slate-500 block text-[10px] uppercase font-bold">Assigned to Works</span>
+        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-slate-500 block text-[10px] uppercase font-bold">Pending</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl font-extrabold text-indigo-700">{countAssigned}</span>
-            <span className="text-[10px] text-indigo-500 font-semibold">Active Orders</span>
+            <span className="text-2xl font-extrabold text-amber-600">{countPending}</span>
           </div>
+          <span className="text-[10px] text-amber-600/80 font-medium">Unassigned</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <span className="text-slate-500 block text-[10px] uppercase font-bold">In Verification</span>
+        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-slate-500 block text-[10px] uppercase font-bold">In Progress</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl font-extrabold text-sky-700">{countInVerification}</span>
-            <span className="text-[10px] text-sky-600 font-semibold">AI Auditing</span>
+            <span className="text-2xl font-extrabold text-indigo-700">{countInProgress}</span>
           </div>
+          <span className="text-[10px] text-indigo-500 font-medium">Assigned / Works</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <span className="text-slate-500 block text-[10px] uppercase font-bold">Verified Repaired</span>
+        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-slate-500 block text-[10px] uppercase font-bold">Repair Claimed</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl font-extrabold text-emerald-700">{countVerified}</span>
-            <span className="text-[10px] text-emerald-600 font-semibold">Payout Approved</span>
+            <span className="text-2xl font-extrabold text-amber-700">{countRepairClaimed}</span>
           </div>
+          <span className="text-[10px] text-amber-600 font-medium">Evidence Uploaded</span>
         </div>
 
-        <div className="bg-rose-50 p-3.5 rounded-xl border border-rose-200 shadow-2xs">
-          <span className="text-rose-700 block text-[10px] uppercase font-bold">Reinspections Alert</span>
+        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-slate-500 block text-[10px] uppercase font-bold">AI Verification</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl font-extrabold text-rose-800">{reinspectionCases.length}</span>
-            <span className="text-[10px] text-rose-600 font-bold">Gaming Flagged</span>
+            <span className="text-2xl font-extrabold text-sky-700">{countAiVerification}</span>
           </div>
+          <span className="text-[10px] text-sky-600 font-medium">In AI Analysis</span>
+        </div>
+
+        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-slate-500 block text-[10px] uppercase font-bold">Resolved</span>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-2xl font-extrabold text-emerald-700">{countResolved}</span>
+          </div>
+          <span className="text-[10px] text-emerald-600 font-medium">Completed</span>
+        </div>
+
+        <div className="bg-rose-50 p-3 rounded-xl border border-rose-200 shadow-2xs">
+          <span className="text-rose-700 block text-[10px] uppercase font-bold">Suspicious</span>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-2xl font-extrabold text-rose-800">{countSuspicious}</span>
+          </div>
+          <span className="text-[10px] text-rose-600 font-bold">Audit Flagged</span>
         </div>
       </div>
 
@@ -295,13 +348,13 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
             onChange={(e) => setStatusFilter(e.target.value)}
             className="text-xs py-1.5 px-2.5 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-2 focus:ring-indigo-600 focus:outline-hidden"
           >
-            <option value="all">All Statuses</option>
-            <option value="Reported">Reported</option>
-            <option value="Assigned">Assigned</option>
-            <option value="Repair In Progress">Repair In Progress</option>
-            <option value="Repair Claimed">Repair Claimed</option>
-            <option value="Verified">Verified</option>
-            <option value="Reinspection Required">Reinspection Required</option>
+            <option value="all">All Statuses ({countTotal})</option>
+            <option value="pending">Pending ({countPending})</option>
+            <option value="inprogress">In Progress ({countInProgress})</option>
+            <option value="repairclaimed">Repair Claimed ({countRepairClaimed})</option>
+            <option value="ai_verification">AI Verification ({countAiVerification})</option>
+            <option value="resolved">Resolved ({countResolved})</option>
+            <option value="suspicious">Suspicious ({countSuspicious})</option>
           </select>
 
           {/* Severity Filter */}
@@ -319,6 +372,21 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
             <option value="Medium">Medium</option>
             <option value="Low">Low</option>
           </select>
+        </div>
+      </div>
+
+      {/* Explicit 'All Complaints' Section per User Requirement */}
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div>
+          <h2 className="text-base font-extrabold text-slate-950 flex items-center gap-2">
+            <span>All Complaints</span>
+            <span className="text-xs font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded-full">
+              {filteredPotholes.length} {filteredPotholes.length === 1 ? 'record' : 'records'}
+            </span>
+          </h2>
+          <p className="text-xs text-slate-500">
+            Municipal jurisdiction view across all citizen reports and contractor assignments.
+          </p>
         </div>
       </div>
 

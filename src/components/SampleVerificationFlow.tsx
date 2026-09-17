@@ -29,8 +29,8 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
   onResolveComplaint,
   onViewDetails,
 }) => {
-  // Scenario switcher: 'genuine' (Mumbai) or 'gaming' (Bengaluru)
-  const [activeScenario, setActiveScenario] = useState<'genuine' | 'gaming'>('genuine');
+  // Scenario switcher: 'genuine' (Mumbai), 'suspicious' (Delhi), or 'gaming' (Bengaluru)
+  const [activeScenario, setActiveScenario] = useState<'genuine' | 'suspicious' | 'gaming'>('genuine');
 
   // Steps: 1: Assign Contractor, 2: Contractor Repair Upload, 3: AI Verification, 4: Verification Result
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -68,7 +68,34 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
     updatedAt: '2026-09-12T09:42:15.000Z',
   };
 
-  // Scenario 2 data (Contractor Gaming Attempt)
+  // Scenario 2 data (Suspicious Repair)
+  const suspiciousPothole: PotholeRecord = {
+    potholeId: 'PTH-DEL-2026-00031',
+    reportedBy: {
+      uid: 'user_kavita_singh',
+      name: 'Kavita Singh',
+      email: 'kavita.singh@example.in',
+    },
+    description: 'Deep road depression near bus shelter causing vehicular deviation and traffic deceleration.',
+    severity: 'Medium',
+    latitude: 28.6139,
+    longitude: 77.2090,
+    address: 'Ring Road Corridor, Near Bus Shelter #4, New Delhi - 110001',
+    landmark: 'Opposite Metro Pillar #114 and green barrier railing',
+    beforeImageUrl: ROAD_IMAGES.mumbaiPotholeBefore,
+    beforeTimestamp: '2026-09-11T14:20:00.000Z',
+    beforeCaptureMetadata: {
+      captureSource: 'device_camera',
+      accuracyMeters: 6.0,
+      deviceTimestamp: '2026-09-11T14:20:00.000Z',
+      aspectRatio: '4:3',
+    },
+    status: 'Reported',
+    createdAt: '2026-09-11T14:20:00.000Z',
+    updatedAt: '2026-09-11T14:20:00.000Z',
+  };
+
+  // Scenario 3 data (Contractor Gaming Attempt)
   const gamingPothole: PotholeRecord = {
     potholeId: 'PTH-BLR-2026-00088',
     reportedBy: {
@@ -95,26 +122,48 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
     updatedAt: '2026-09-13T11:05:00.000Z',
   };
 
-  const currentPothole = activeScenario === 'genuine' ? genuinePothole : gamingPothole;
+  const currentPothole =
+    activeScenario === 'genuine'
+      ? genuinePothole
+      : activeScenario === 'suspicious'
+      ? suspiciousPothole
+      : gamingPothole;
 
   // Contractor submitted after data
   const afterPhotoUrl =
     activeScenario === 'genuine'
       ? ROAD_IMAGES.mumbaiPotholeAfterGenuine
+      : activeScenario === 'suspicious'
+      ? ROAD_IMAGES.mumbaiPotholeAfterGenuine
       : ROAD_IMAGES.blrPotholeAfterGaming;
 
-  const afterLat = activeScenario === 'genuine' ? currentPothole.latitude + 0.00003 : currentPothole.latitude - 0.0074;
-  const afterLon = activeScenario === 'genuine' ? currentPothole.longitude + 0.00002 : currentPothole.longitude + 0.0076;
+  // For suspicious, delta is ~28 meters (exceeds 15m threshold, causing SUSPICIOUS)
+  const afterLat =
+    activeScenario === 'genuine'
+      ? currentPothole.latitude + 0.00003
+      : activeScenario === 'suspicious'
+      ? currentPothole.latitude + 0.00025
+      : currentPothole.latitude - 0.0074;
+
+  const afterLon =
+    activeScenario === 'genuine'
+      ? currentPothole.longitude + 0.00002
+      : activeScenario === 'suspicious'
+      ? currentPothole.longitude + 0.00018
+      : currentPothole.longitude + 0.0076;
+
   const afterDesc =
     activeScenario === 'genuine'
       ? 'Excavated loose subgrade, applied RS-1 tack coat, filled with hot-mix dense bituminous macadam (DBM) and compacted flush with road level.'
+      : activeScenario === 'suspicious'
+      ? 'Patched road section with cold mix asphalt. Camera angle shifted due to active traffic congestion.'
       : 'Completed surface patch with asphalt mix on road.';
 
   // Result computation using RoadSetu AI engine
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
 
   // Switch scenario handler
-  const handleSelectScenario = (sc: 'genuine' | 'gaming') => {
+  const handleSelectScenario = (sc: 'genuine' | 'suspicious' | 'gaming') => {
     setActiveScenario(sc);
     setCurrentStep(1);
     setVerificationResult(null);
@@ -122,6 +171,9 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
     if (sc === 'genuine') {
       setContractorName('Ramesh Patel');
       setContractorCompany('InfraTech RoadWorks Pvt Ltd');
+    } else if (sc === 'suspicious') {
+      setContractorName('Sunil Varma');
+      setContractorCompany('Capital City Civil Infrastructure');
     } else {
       setContractorName('Vikram Choudhury');
       setContractorCompany('Apex Urban Infrastructure Ltd');
@@ -181,7 +233,7 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
         </div>
 
         {/* Quick Scenario Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => handleSelectScenario('genuine')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -190,7 +242,17 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
                 : 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
             }`}
           >
-            Sample 1: Genuine Repair
+            Sample 1: Genuine Repair (🟢)
+          </button>
+          <button
+            onClick={() => handleSelectScenario('suspicious')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeScenario === 'suspicious'
+                ? 'bg-amber-700 text-white shadow-xs'
+                : 'bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100'
+            }`}
+          >
+            Sample 2: Suspicious Repair (🟡)
           </button>
           <button
             onClick={() => handleSelectScenario('gaming')}
@@ -200,7 +262,7 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
                 : 'bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100'
             }`}
           >
-            Sample 2: Gaming Attempt
+            Sample 3: Gaming Attempt (🔴)
           </button>
           <button
             onClick={handleResetWorkflow}
@@ -509,13 +571,13 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
               <span>Multi-Factor AI Checks to be Executed:</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 text-center text-[11px]">
-              <div className="p-2 rounded bg-slate-800 text-slate-300">1. GPS / location</div>
-              <div className="p-2 rounded bg-slate-800 text-slate-300">2. Pothole region</div>
-              <div className="p-2 rounded bg-slate-800 text-slate-300">3. Camera viewpoint</div>
-              <div className="p-2 rounded bg-slate-800 text-slate-300">4. Landmarks</div>
-              <div className="p-2 rounded bg-slate-800 text-slate-300">5. Road surface</div>
-              <div className="p-2 rounded bg-slate-800 text-slate-300">6. Timestamp</div>
-              <div className="p-2 rounded bg-slate-800 text-slate-300">7. Repair evidence</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">1. GPS/location</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">2. Pothole/damaged region</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">3. Camera viewpoint</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">4. Background/landmarks</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">5. Road surface</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">6. Timestamp</div>
+              <div className="p-2 rounded bg-slate-800 text-slate-200 font-medium">7. Visual repair evidence</div>
             </div>
           </div>
 
@@ -636,14 +698,14 @@ export const SampleVerificationFlow: React.FC<SampleVerificationFlowProps> = ({
                     </span>
                   </div>
                   <p className="text-xs font-semibold text-rose-900 mt-1">
-                    → Invalid or unrelated evidence detected.
+                    → Invalid/unrelated evidence
                   </p>
                   <p className="text-xs text-rose-800 mt-0.5 leading-relaxed">
                     Distance delta is {formatDistance(verificationResult.distanceMeters)} (critical mismatch exceeding 15.0m threshold).
                     Background landmarks (residential wall vs commercial glass towers) fail completely.
                   </p>
                   <div className="mt-2 text-xs font-extrabold text-rose-950">
-                    → Do NOT mark as resolved. Payout strictly blocked.
+                    → Do NOT mark as resolved
                   </div>
                 </div>
               </div>

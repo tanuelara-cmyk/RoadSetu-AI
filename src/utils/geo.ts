@@ -79,10 +79,10 @@ export async function reverseGeocode(lat: number, lon: number): Promise<string> 
       }
     }
   } catch {
-    // Network or timeout failure; use clean coordinate fallback
+    // Network or timeout failure; use clean civic fallback without raw coordinates
   }
 
-  return `Near coordinates ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+  return 'Civic Road Section (Location Detected)';
 }
 
 /**
